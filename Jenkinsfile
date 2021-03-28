@@ -52,7 +52,6 @@ pipeline {
       }
      }
      steps {
-      sh ' mvn checkstyle:checkstyle'
       sh "mvn checkstyle:check"
       recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
      }
