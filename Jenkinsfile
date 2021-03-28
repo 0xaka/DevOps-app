@@ -51,15 +51,16 @@ pipeline {
        reuseNode true
       }
      }
-     	stage('Checkstyle') {
-                    steps {
-                        sh "mvn checkstyle:check"
-                        recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
-                    }
-                }
+     steps {
+      sh "mvn checkstyle:check"
+      recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+     }
     }
    }
   }
+  
+  
+  
   stage('Unit Tests') {
    when {
     anyOf { branch 'master'; branch 'develop' }
