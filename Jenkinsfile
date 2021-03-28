@@ -43,6 +43,12 @@ pipeline {
       sh ' mvn clean compile'
      }
     }
+	stage('Checkstyle') {
+                    steps {
+                        sh "mvn checkstyle:check"
+                        recordIssues(tools: [checkStyle(reportEncoding: 'UTF-8')])
+                    }
+                }
    }
   }
   stage('Unit Tests') {
