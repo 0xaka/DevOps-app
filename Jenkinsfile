@@ -1,12 +1,24 @@
 pipeline {
     agent any
-
+    
+    options {
+        skipDefaultCheckout()
+    }
+        
     stages {
-        stage('Build') {
+        
+        stage('SCM') {
+           steps {
+            checkout scm
+           }
+        }
+        
+        stage('Compile') {
             steps {
-                echo 'Building..'
+                sh ' mvn clean compile'
             }
         }
+        
         stage('Test') {
             steps {
                 echo 'Testing..'
