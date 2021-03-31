@@ -1,32 +1,14 @@
 pipeline {
-    agent any
-    
-    options {
-        skipDefaultCheckout()
+    agent {
+        docker {
+            image 'maven:3-alpine' 
+            args '-v /root/.m2:/root/.m2' 
+        }
     }
-        
     stages {
-        
-        stage('SCM') {
-           steps {
-            checkout scm
-           }
-        }
-        
-        stage('Compile') {
+        stage('Build') { 
             steps {
-                sh ' mvn clean compile'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+                sh 'mvn -B -DskipTests clean package' 
             }
         }
     }
