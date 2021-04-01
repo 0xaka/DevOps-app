@@ -13,7 +13,7 @@ pipeline {
                 sh '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
-
+	}
         stage ('Analysis') {
              agent {
               docker {
@@ -26,7 +26,7 @@ pipeline {
                 sh '${M2_HOME}/bin/mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs'
             }
         }
-    }
+  
     post {
         always {
             junit testResults: '**/target/surefire-reports/TEST-*.xml'
@@ -38,4 +38,6 @@ pipeline {
             recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
         }
     }
+  }
+  
 }
