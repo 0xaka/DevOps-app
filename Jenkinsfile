@@ -1,37 +1,31 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
+    agent 'any'
+    tools {
+        maven 'mvn-default'
+        jdk 'jdk-default'
     }
-    options {
-        skipStagesAfterUnstable()
-    }
-	
     stages {
-	
-        stage('Build') {
+        stage ('Build') {
             steps {
-                sh 'mvn -B -DskipTests clean package'
+                sh '${M2_HOME}/bin/mvn --batch-mode -V -U -e clean verify -Dsurefire.useFile=false -Dmaven.test.failure.ignore'
             }
         }
-		
-        stage('Test') {
+
+        stage ('Analysis') {
             steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                sh '${M2_HOME}/bin/mvn --batch-mode -V -U -e checkstyle:checkstyle pmd:pmd pmd:cpd findbugs:findbugs spotbugs:spotbugs'
             }
         }
-		
-        stage('Deliver') { 
-            steps {
-                sh 'echo Deliver' 
-            }
+    }
+    post {
+        always {
+            junit testResults: '**/target/surefire-reports/TEST-*.xml'
+
+            recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+            recordIssues enabledForFailure: true, tool: checkStyle()
+            recordIssues enabledForFailure: true, tool: spotBugs()
+            recordIssues enabledForFailure: true, tool: cpd(pattern: '**/target/cpd.xml')
+            recordIssues enabledForFailure: true, tool: pmdParser(pattern: '**/target/pmd.xml')
         }
     }
 }
